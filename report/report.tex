@@ -1,28 +1,28 @@
 \documentclass[11pt,a4paper]{article}
 
-% Pakete für Sprache und Kodierung
+% Packages for language and encoding
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[ngerman]{babel} % Auf 'english' ändern, falls der Report auf Englisch sein soll
+\usepackage[english]{babel}
 
-% Paket für Code-Listings im Anhang
+% Package for code listings in the appendix
 \usepackage{listings}
 \usepackage{xcolor}
 
-% Seitenränder anpassen (hilft, die 1-Seiten-Vorgabe gut zu nutzen)
+% Adjust page margins
 \usepackage{geometry}
 \geometry{a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
 
-% --- TITELBLATT ---
+% --- TITLE PAGE ---
 \title{Advanced Computer Architecture 2026 \\ 
-\large HW \#3.1-FPGA, Input/Output Subsystem - Interrupt-driven IO}
+\large Lab \#3.4 -- FPGA, Kernel Optimization}
 
 \author{
-  Mistura Arcoverde Cavalcanti, Tarik \\ \small Matrikelnummer: 3683193
+  Mistura Arcoverde Cavalcanti, Tarik \\ \small Student ID: 3683193
   \and
-  Neumann, Christopher Kaspar Leon \\ \small Matrikelnummer: 4768204
+  Neumann, Christopher Kaspar Leon \\ \small Student ID: 4768204
   \and
-  Scherrer, Lorenz \\ \small Matrikelnummer: 4749927
+  Scherrer, Lorenz \\ \small Student ID: 4749927
 }
 \date{\today}
 
@@ -30,58 +30,50 @@
 
 \maketitle
 
-% --- TEIL 1: KONZEPTIONELLER UNTERSCHIED ---
-\section{Conceptual Difference between Polled and Interrupt I/O}
-
-
-% --- TEIL 2: IMPLEMENTIERUNGSMETHODE ---
 \section{Implementation Methodology}
+The objective of this lab was to establish a baseline for four distinct kernels and then apply software optimization techniques (such as loop unrolling, register caching, and branch elimination) to improve their performance on the MicroBlaze processor. 
 
+To achieve this, we developed a \texttt{main.c} testbench that dynamically allocates test arrays on the external heap memory (DDR) and initializes them with pseudo-random data. We then utilized the AXI timer to accurately measure the execution time of both the baseline and the manually optimized kernels running on the same data. All memory accesses are performed within the MicroBlaze's memory hierarchy.
 
-\section{Baseline}
+The manual code optimizations included:
+\begin{itemize}
+    \item \textbf{Kernel 1:} Loop unrolling by a factor of 4 to reduce loop control overhead.
+    \item \textbf{Kernel 2:} Register caching to prevent continuous redundant memory reads of \texttt{A[i-1]}, \texttt{A[i-2]}, and \texttt{A[i-3]}.
+    \item \textbf{Kernel 3:} Pointer aliasing hints using the \texttt{restrict} keyword alongside loop unrolling to optimize indirect memory access.
+    \item \textbf{Kernel 4:} Branch elimination using ternary operators instead of \texttt{if}-statements to avoid branch misprediction penalties, combined with accumulator splitting to reduce data dependencies.
+\end{itemize}
 
-1,2765s
+\section{Results and Discussion}
 
-Starting Baseline Benchmark for Kernels 1-4
-Kernel 1 Time: 0.010348s
-Kernel 2 Time: 0.035509s
-Kernel 3 Time: 0.057139s
-Kernel 4 Time: 0.098405s, Result: 171976
-Benchmark Complete.
+The hardware execution yielded the following performance metrics (measured in seconds):
 
-Compiler optimization
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Kernel} & \textbf{Baseline (No Opt)} & \textbf{Code Opt (No Comp Opt)} & \textbf{Compiler Opt Only} & \textbf{Code + Compiler Opt} \\
+\hline
+Kernel 1 & 0.010348 & 0.009702 & 0.007252 & 0.007278 \\
+Kernel 2 & 0.035509 & 0.026219 & 0.022088 & 0.022622 \\
+Kernel 3 & 0.057139 & 0.056912 & 0.050284 & 0.050202 \\
+Kernel 4 & 0.098405 & 0.112430 & 0.095390 & 0.109440 \\
+\hline
+\end{tabular}
+\end{center}
 
-Starting Baseline Benchmark for Kernels 1-4
-Kernel 1 Time: 0.007252s
-Kernel 2 Time: 0.022088s
-Kernel 3 Time: 0.050284s
-Kernel 4 Time: 0.095390s, Result: 171976
-Benchmark Complete.
+\subsection{Interpretation of Results}
+The results demonstrate the power of modern compiler optimization compared to manual C-level code refactoring. 
 
-Code and Compiler optimization
-Starting Benchmark for Kernels 1-4 (Baseline vs Optimized)
-Kernel 1 -> Base: 0.007249s | Opt: 0.007278s
-Kernel 2 -> Base: 0.022088s | Opt: 0.022622s
-Kernel 3 -> Base: 0.050287s | Opt: 0.050202s
-Kernel 4 -> Base: 0.095394s (Res: 171976) | Opt: 0.109440s (Res: 171976)
-Benchmark Complete.
+\textbf{Without Compiler Optimization (-O0):} Manual optimizations showed clear benefits for Kernel 1 and Kernel 2. Register caching in Kernel 2 was the most beneficial manual optimization, reducing the execution time from $0.0355s$ to $0.0262s$. This highlights that memory access latency is a primary bottleneck, and manually keeping data in registers bypasses it. Kernel 4, however, became slower with manual code optimizations. The introduction of four accumulators and the ternary operator likely caused register spilling and instruction overhead that a non-optimizing compiler could not handle efficiently.
 
-Code optimization comparison without compiler optimization
-Starting Benchmark for Kernels 1-4 (Baseline vs Optimized)
-Kernel 1 -> Base: 0.010348s | Opt: 0.009702s
-Kernel 2 -> Base: 0.035514s | Opt: 0.026219s
-Kernel 3 -> Base: 0.057144s | Opt: 0.056912s
-Kernel 4 -> Base: 0.098406s (Res: 171976) | Opt: 0.112430s (Res: 171976)
-Benchmark Complete.
+\textbf{With Compiler Optimization (-O2/-O3):} When compiler optimizations were enabled, the baseline kernels matched or outperformed our manually optimized versions. The compiler is already capable of aggressively unrolling loops, caching array accesses in registers, and scheduling instructions to hide latencies. In fact, our manual optimizations for Kernel 1, 2, and 4 slightly degraded performance compared to the compiler's own optimized baseline. This indicates that manual loop unrolling and accumulator splitting can interfere with the compiler's heuristics, leading to suboptimal instruction scheduling.
 
+\subsection{Conclusion on Kernel Complexity}
+Kernel 2 was the easiest to manually optimize because its data dependency pattern explicitly reuses recently computed values, making register caching trivial to implement. Conversely, Kernel 4 was difficult to optimize manually because eliminating branches with ternary operators relies entirely on the compiler's ability to map them to conditional move instructions. When the compiler fails to do so (as seen in the increased execution time), the manual optimization becomes detrimental.
 
-% --- ANHANG: CODE ---
+% --- APPENDIX: CODE ---
 \newpage
 \appendix
-\section{Code}
-% TODO: Hier fügt ihr euren C-Code ein. 
-% Die Einstellungen für 'listings' machen den Code lesbarer.
-
+\section{Code Appendix}
 \lstset{
     language=C,
     basicstyle=\ttfamily\footnotesize,
@@ -95,6 +87,10 @@ Benchmark Complete.
     frame=single
 }
 
-\lstinputlisting[language=C]{/home/lorenz/Desktop/UniHeidelberg/Semester4/ACA/src/interrupt_io/main.c}
+\subsection{Main Execution and Benchmarking (main.c)}
+\lstinputlisting[language=C]{../lab2/src/kernels_baseline/main.c}
+
+\subsection{Optimized Kernels (kernels\_opt.c)}
+\lstinputlisting[language=C]{../lab2/src/kernels_baseline/kernels_opt.c}
 
 \end{document}

@@ -1,0 +1,35 @@
+# Hilfs- und Logdateien
+*.aux
+*.bcf
+*.blg
+*.bbl
+*.brf
+*.fls
+*.fdb_latexmk
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.toc
+*.vrb
+
+# SyncTeX für die Navigation zwischen Code und PDF
+*.synctex.gz
+*.synctex.gz(busy)
+*.synctex(busy)
+
+# Kompilierte Dokumente (Build-Artefakte)
+*.dvi
+*.ps
+*.pdf
+
+# Temporäre Dateien von Editoren (optional, aber nützlich)
+*.swp
+*~
+.vscode/

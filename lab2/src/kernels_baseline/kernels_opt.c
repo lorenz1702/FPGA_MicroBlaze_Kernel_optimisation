@@ -1,7 +1,7 @@
 #include "kernels_opt.h"
 
-// Kernel 1: Loop unrolling. 
-// Reduziert den Loop-Overhead und erlaubt es dem Compiler, Instruktionen besser zu schedulen.
+// Kernel 1: Loop unrolling.
+// Reduces loop overhead and allows the compiler to better schedule instructions.
 void kernel1_opt (int * restrict A, int size, int offset) {
     int i;
     int limit = size - offset;
@@ -20,9 +20,9 @@ void kernel1_opt (int * restrict A, int size, int offset) {
     }
 }
 
-// Kernel 2: Register Caching. 
-// Im Original muss A[i-1], A[i-2], A[i-3] jedes mal aus dem Speicher gelesen werden.
-// Wir cachen diese in lokalen Variablen (Registern), was Speicherzugriffe drastisch reduziert.
+// Kernel 2: Register Caching.
+// In the original, A[i-1], A[i-2], A[i-3] must be read from memory every iteration.
+// We cache these in local variables (registers), which drastically reduces memory accesses.
 void kernel2_opt (int * restrict A, int size) {
     if (size <= 3) return;
     
@@ -41,9 +41,9 @@ void kernel2_opt (int * restrict A, int size) {
     }
 }
 
-// Kernel 3: Loop unrolling & Pointer Aliasing. 
-// "restrict" versichert dem Compiler, dass h, w und idx nicht im Speicher überlappen.
-// Unrolling beschleunigt die Ausführung.
+// Kernel 3: Loop unrolling & Pointer Aliasing.
+// "restrict" assures the compiler that h, w, and idx do not overlap in memory.
+// Unrolling speeds up execution.
 void kernel3_opt (float * restrict h, const float * restrict w, const int * restrict idx, int size) {
     int i;
     // Unroll by 4
@@ -59,9 +59,9 @@ void kernel3_opt (float * restrict h, const float * restrict w, const int * rest
 }
 
 // Kernel 4: Branch Elimination & Accumulator Splitting.
-// Die if(diff > 0) Bedingung stört die Branch Prediction und blockiert Pipelining.
-// Wir ersetzen sie durch einen Ternary Operator, der vom Compiler oft als Conditional Move kompiliert wird.
-// Zudem splitten wir "sum" in sum1, sum2, sum3, sum4 um Data Dependencies aufzubrechen.
+// The if(diff > 0) condition ruins branch prediction and blocks pipelining.
+// We replace it with a ternary operator, which is often compiled to a Conditional Move.
+// We also split "sum" into sum1, sum2, sum3, sum4 to break data dependencies.
 float kernel4_opt (const float * restrict A, const float * restrict B, int size) {
     float sum1 = 0.0f, sum2 = 0.0f, sum3 = 0.0f, sum4 = 0.0f;
     int i;
