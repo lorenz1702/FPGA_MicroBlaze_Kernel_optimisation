@@ -1,0 +1,71 @@
+\documentclass[11pt,a4paper]{article}
+
+% Pakete für Sprache und Kodierung
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel} % Auf 'english' ändern, falls der Report auf Englisch sein soll
+
+% Paket für Code-Listings im Anhang
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Seitenränder anpassen (hilft, die 1-Seiten-Vorgabe gut zu nutzen)
+\usepackage{geometry}
+\geometry{a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% --- TITELBLATT ---
+\title{Advanced Computer Architecture 2026 \\ 
+\large HW \#3.1-FPGA, Input/Output Subsystem - Interrupt-driven IO}
+
+\author{
+  Mistura Arcoverde Cavalcanti, Tarik \\ \small Matrikelnummer: TODO
+  \and
+  Neumann, Christopher Kaspar Leon \\ \small Matrikelnummer: TODO
+  \and
+  Scherrer, Lorenz \\ \small Matrikelnummer: 4749927
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% --- TEIL 1: KONZEPTIONELLER UNTERSCHIED ---
+\section{Conceptual Difference between Polled and Interrupt I/O}
+
+
+% --- TEIL 2: IMPLEMENTIERUNGSMETHODE ---
+\section{Implementation Methodology}
+
+
+\section{Baseline}
+
+1,2765s
+
+
+
+
+
+% --- ANHANG: CODE ---
+\newpage
+\appendix
+\section{Code}
+% TODO: Hier fügt ihr euren C-Code ein. 
+% Die Einstellungen für 'listings' machen den Code lesbarer.
+
+\lstset{
+    language=C,
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    breaklines=true,
+    frame=single
+}
+
+\lstinputlisting[language=C]{/home/lorenz/Desktop/UniHeidelberg/Semester4/ACA/src/interrupt_io/main.c}
+
+\end{document}
