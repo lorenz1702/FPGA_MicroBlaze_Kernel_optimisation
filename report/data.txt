@@ -1,0 +1,20 @@
+Kernel_opt O0
+Kernel 1 -> Base: 0.487465s | Opt: 0.408129s
+Kernel 2 -> Base: 0.552475s | Opt: 0.462474s
+Kernel 3 -> Base: 1.083758s | Opt: 1.037029s
+Kernel 4 -> Base: 0.594062s (Res: 2147483647) | Opt: 0.599640s (Res: 2147483647)
+Kernel_opt O3
+Kernel 1 -> Base: 0.162491s | Opt: 0.132948s
+Kernel 2 -> Base: 0.062476s | Opt: 0.122475s
+Kernel 3 -> Base: 0.801034s | Opt: 0.764330s
+Kernel 4 -> Base: 0.301060s (Res: 2147483647) | Opt: 0.223311s (Res: 2147483647)
+-fp + cache O0
+Kernel 1 -> Base: 0.609334s | Opt: 0.516259s
+Kernel 2 -> Base: 2.873910s | Opt: 2.615170s
+Kernel 3 -> Base: 5.134335s | Opt: 5.117091s
+Kernel 4 -> Base: 9.675646s (Res: 16658864) | Opt: 11.125002s (Res: 16659174)
+-fp + cache O3
+Kernel 1 -> Base: 0.279217s | Opt: 0.282239s
+Kernel 2 -> Base: 2.201838s | Opt: 2.255172s
+Kernel 3 -> Base: 4.685731s | Opt: 4.716538s
+Kernel 4 -> Base: 9.375643s (Res: 16658864) | Opt: 10.828760s (Res: 16659174)
